@@ -1,0 +1,347 @@
+---
+// Hero con scroll (spec 008): un cursor arma el flujo, alguien conversa y luego intenta saltarse las reglas.
+// El HTML es la escena final completa; el script solo la rebobina y la recorre con el scroll.
+import type { TipoPaso } from '../data/agentes';
+import { nodos, cables, disposiciones, leyendas, mensajes, NODO_W as W, NODO_H as H, type IdNodo, type NodoFlujo } from '../data/heroFlujo';
+
+const etiqueta: Record<TipoPaso, string> = { entrada: 'ENTRADA', ia: 'IA', codigo: 'CÓDIGO', humano: 'HUMANO' };
+const tipoDe = Object.fromEntries(nodos.map((n) => [n.id, n.tipo])) as Record<IdNodo, TipoPaso>;
+const subFinal = (n: NodoFlujo) => n.estados?.at(-1)?.[1] ?? n.sub;
+const inicial = leyendas[0][1];
+const final = leyendas[leyendas.length - 1][1];
+const vistas = (['ancha', 'alta'] as const).map((k) => ({ k, ...disposiciones[k] }));
+
+// Curva entre los bordes de dos nodos: horizontal si están en la misma fila, vertical si no.
+function camino([ax, ay]: [number, number], [bx, by]: [number, number]) {
+  const dx = bx - ax, dy = by - ay;
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    const s = Math.sign(dx), x0 = ax + s * W / 2, x1 = bx - s * W / 2, k = (x1 - x0) / 2;
+    return `M${x0},${ay} C${x0 + k},${ay} ${x1 - k},${by} ${x1},${by}`;
+  }
+  const s = Math.sign(dy), y0 = ay + s * H / 2, y1 = by - s * H / 2, k = (y1 - y0) / 2;
+  return `M${ax},${y0} C${ax},${y0 + k} ${bx},${y1 - k} ${bx},${y1}`;
+}
+
+const descripcion = 'Flujo de un agente: el cliente escribe por WhatsApp; el agente de IA conversa y propone; una compuerta de código valida y calcula el total (36.000 más IVA, 42.840) y la reserva bloquea el cupo 30 minutos. Cuando alguien intenta saltarse las reglas, la compuerta lo bloquea y una persona revisa el caso.';
+---
+<div class="hf">
+  <div class="stage">
+    <div class="head">
+      <span class="label">Arquitecto de soluciones de IA · Bogotá</span>
+      <h1><span class="m">El modelo conversa.</span> <span class="c">El código decide.</span></h1>
+      <p class="who"><span><b>10+ años</b> en software y producto</span> <span><b>Líder de IA</b> · Consultorsalud · 2026</span> <span><b>Claude · MCP · Agentes · RAG</b></span></p>
+      <p class="cap"><span class="c-ini">{inicial.antes}</span><span class="c-fin">{final.antes}<b>{final.negrita}</b></span></p>
+    </div>
+    <div class="rail" aria-hidden="true"><i></i><span>Construir</span><span>Conversar</span><span>Defender</span></div>
+    <div class="main">
+      <div class="flow">
+        {vistas.map(({ k, w, h, pos }) => (
+          <svg class={`v-${k}`} data-lay={k} viewBox={`0 0 ${w} ${h}`} role="img" aria-label={descripcion}>
+            <defs>
+              <filter id={`glow-${k}`} x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="3" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+              <filter id={`soft-${k}`} x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9" /></filter>
+            </defs>
+            <g>{nodos.map((n) => <rect class="slot" x={pos[n.id][0] - W / 2} y={pos[n.id][1] - H / 2} width={W} height={H} rx="10" />)}</g>
+            <g>{cables.map((c) => <path class={`edge t-${tipoDe[c.a]}`} data-e={c.id} d={camino(pos[c.de], pos[c.a])} />)}</g>
+            <g>
+              {nodos.map((n) => (
+                <g class:list={['node', `t-${n.tipo}`, { bad: n.id === 'compuerta' }]} data-n={n.id} transform={`translate(${pos[n.id][0]} ${pos[n.id][1]})`}>
+                  <rect class="halo" x={-W / 2 - 4} y={-H / 2 - 4} width={W + 8} height={H + 8} rx="14" filter={`url(#soft-${k})`} />
+                  <rect class="box" x={-W / 2} y={-H / 2} width={W} height={H} rx="10" />
+                  <text class="tg" x={-W / 2 + 12} y={-H / 2 + 15}>{etiqueta[n.tipo]}</text>
+                  <text class="lbl" x={-W / 2 + 12} y="4">{n.texto}</text>
+                  <text class="sub" x={-W / 2 + 12} y={H / 2 - 11}>{subFinal(n)}</text>
+                </g>
+              ))}
+              <rect class="shield" x={pos.compuerta[0] - W / 2 - 9} y={pos.compuerta[1] - H / 2 - 9} width={W + 18} height={H + 18} rx="16" opacity=".4" stroke-width="1.5" />
+            </g>
+            <g>{['ai', 'bad', 'ok'].map((t) => <circle class={`pulse p-${t}`} r="5" filter={`url(#glow-${k})`} />)}</g>
+            <g class="cur">
+              <line x1="-16" y1="0" x2="-9" y2="0" /><line x1="9" y1="0" x2="16" y2="0" />
+              <circle class="r" r="8" /><circle class="d" r="2.2" />
+              <text x="14" y="-12">arquitecto</text>
+            </g>
+          </svg>
+        ))}
+        <p class="ilus">Escena ilustrativa</p>
+      </div>
+      <div class="chat">
+        <div class="chat-h"><span class="dot" aria-hidden="true"></span>Chat con el agente</div>
+        <div class="msgs">
+          {mensajes.map((m) => <p class:list={['msg', m.de === 'bad' ? 'user bad' : m.de]}>{m.texto}{m.nota && <small>{m.nota}</small>}</p>)}
+        </div>
+      </div>
+    </div>
+    <div class="cta"><a href="/arquitectura/">Ver cómo diseño agentes</a><span aria-hidden="true">Sube para rebobinar ↑</span></div>
+    <div class="hint" aria-hidden="true">Desliza</div>
+  </div>
+</div>
+
+<script>
+  import { nodos, cables, disposiciones, pasosConstruir, leyendas, mensajes, type Disposicion } from '../data/heroFlujo';
+
+  type Punto = [number, number];
+  const hf = document.querySelector<HTMLElement>('.hf');
+  if (hf) iniciar(hf);
+
+  function iniciar(hf: HTMLElement) {
+    const red = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const animar = matchMedia('(scripting: enabled) and (prefers-reduced-motion: no-preference)').matches
+      && !red?.saveData && !/2g$/.test(red?.effectiveType ?? '');
+    if (!animar) { hf.classList.add('still'); return; }
+    hf.classList.add('live');
+
+    const stage = hf.querySelector<HTMLElement>('.stage')!, flow = hf.querySelector<HTMLElement>('.flow')!;
+    const cap = hf.querySelector<HTMLElement>('.cap')!, rail = hf.querySelector<HTMLElement>('.rail')!;
+    const fases = rail.querySelectorAll('span'), chat = hf.querySelector('.chat')!, cta = hf.querySelector('.cta')!;
+    const hint = hf.querySelector<HTMLElement>('.hint')!, msgs = hf.querySelectorAll('.msg');
+    const angosta = matchMedia('(max-width: 760px)');
+
+    // Cuándo se ilumina cada nodo durante la conversación y la defensa.
+    const activo: Record<string, Punto[]> = {
+      entrada: [[.47, .5], [.72, .75]], agente: [[.515, .58], [.755, .78]], compuerta: [[.6, .7]], reserva: [[.655, .71]], persona: [[.845, .95]],
+    };
+    // Recorridos de cada pulso: [cables, desde, hasta].
+    const tramos: [string[], number, number][][] = [
+      [[['e1'], .48, .52], [['e2'], .565, .6], [['e3'], .63, .66]],
+      [[['e1', 'e2'], .73, .79]],
+      [[['e4'], .81, .845]],
+    ];
+    const B0 = .06, B1 = .42, SPAN = (B1 - B0) / pasosConstruir.length;
+    const clamp = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
+    const ease = (t: number) => t * t * (3 - 2 * t);
+    const seg = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
+    const op = (el: Element, v: number) => (el as SVGElement).style.setProperty('opacity', String(v));
+
+    let L: Disposicion, cur: SVGGElement, shield: SVGRectElement, pulsos: SVGCircleElement[];
+    let N: Record<string, { g: SVGGElement; c: Punto; sub: SVGTextElement }>, E: Record<string, { p: SVGPathElement; len: number }>;
+    let last = -1, leyenda = -1;
+
+    // Toma las referencias del SVG visible (ancho o alto) y prepara el trazado de los cables.
+    function montar() {
+      const k = angosta.matches ? 'alta' : 'ancha', svg = hf.querySelector(`svg[data-lay="${k}"]`)!;
+      L = disposiciones[k]; N = {}; E = {};
+      for (const n of nodos) {
+        const g = svg.querySelector<SVGGElement>(`[data-n="${n.id}"]`)!;
+        N[n.id] = { g, c: L.pos[n.id], sub: g.querySelector<SVGTextElement>('.sub')! };
+      }
+      for (const c of cables) {
+        const p = svg.querySelector<SVGPathElement>(`[data-e="${c.id}"]`)!, len = p.getTotalLength();
+        p.style.setProperty('stroke-dasharray', String(len));
+        E[c.id] = { p, len };
+      }
+      cur = svg.querySelector('.cur')!; shield = svg.querySelector('.shield')!;
+      pulsos = [...svg.querySelectorAll<SVGCircleElement>('.pulse')];
+      last = -1;
+    }
+
+    const punto = (e: { p: SVGPathElement; len: number }, d: number): Punto => { const q = e.p.getPointAtLength(d); return [q.x, q.y]; };
+    const finDe = (id: string): Punto => (N[id] ? N[id].c : punto(E[id], E[id].len));
+
+    function pulso(c: SVGCircleElement, ts: [string[], number, number][], p: number) {
+      const t = ts.find(([, a, b]) => p >= a && p <= b);
+      if (!t) return op(c, 0);
+      const [cadena, a, b] = t;
+      let d = ease(seg(p, a, b)) * cadena.reduce((s, k) => s + E[k].len, 0);
+      for (let i = 0; i < cadena.length; i++) {
+        const e = E[cadena[i]];
+        if (d <= e.len || i === cadena.length - 1) { const [x, y] = punto(e, Math.min(d, e.len)); c.setAttribute('cx', String(x)); c.setAttribute('cy', String(y)); break; }
+        d -= e.len;
+      }
+      op(c, 1);
+    }
+
+    function render(p: number) {
+      if (Math.abs(p - last) < .0004) return;
+      last = p;
+      // 1 · Construir: cada nodo aparece y cada cable se traza en su turno.
+      pasosConstruir.forEach((id, i) => {
+        const t = clamp((p - B0 - i * SPAN) / SPAN), n = N[id];
+        if (n) {
+          const s = ease(clamp((t - .45) / .4));
+          n.g.setAttribute('transform', `translate(${n.c[0]} ${n.c[1]}) scale(${.7 + .3 * s})`);
+          op(n.g, s);
+        } else E[id].p.style.setProperty('stroke-dashoffset', String(E[id].len * (1 - ease(t))));
+      });
+      const ci = Math.max(0, Math.min(pasosConstruir.length - 1, Math.floor((p - B0) / SPAN)));
+      const id = pasosConstruir[ci], ct = clamp((p - B0 - ci * SPAN) / SPAN);
+      const ini: Punto = ci === 0 ? [L.w * .08, L.h * .92] : finDe(pasosConstruir[ci - 1]);
+      let pos: Punto, apretado: boolean;
+      if (N[id]) {
+        const m = ease(clamp(ct / .6)), [tx, ty] = N[id].c;
+        pos = [ini[0] + (tx - ini[0]) * m, ini[1] + (ty - ini[1]) * m]; apretado = ct > .45 && ct < .75;
+      } else { pos = punto(E[id], E[id].len * ease(ct)); apretado = ct > 0 && ct < 1; }
+      cur.setAttribute('transform', `translate(${pos[0]} ${pos[1]}) scale(${apretado ? .8 : 1})`);
+      op(cur, Math.min(seg(p, B0 - .03, B0 + .01), 1 - seg(p, B1, B1 + .04)));
+
+      // 2 · Conversar y 3 · Defender.
+      const lit = p > .48 && p < .7, bad = p > .79;
+      for (const k of ['e1', 'e2', 'e3']) E[k].p.classList.toggle('lit', lit);
+      pulsos.forEach((c, i) => pulso(c, tramos[i], p));
+      for (const n of nodos) {
+        const { g, sub } = N[n.id], txt = n.estados?.filter(([d]) => p > d).pop()?.[1] ?? n.sub;
+        g.classList.toggle('act', activo[n.id].some(([a, b]) => p > a && p < b));
+        if (sub.textContent !== txt) sub.textContent = txt;
+      }
+      N.compuerta.g.classList.toggle('bad', bad);
+      const sh = seg(p, .79, .83);
+      op(shield, bad ? .9 - .5 * sh : 0);
+      shield.setAttribute('stroke-width', String(bad ? 1.5 + 2 * (1 - sh) : 0));
+
+      chat.classList.toggle('on', p > .44);
+      msgs.forEach((m, i) => m.classList.toggle('on', p >= mensajes[i].desde));
+      cta.classList.toggle('on', p > .92);
+      op(hint, p < .03 ? 1 : 0);
+      const li = leyendas.findLastIndex(([d]) => p >= d);
+      if (li !== leyenda) {
+        leyenda = li;
+        const { antes, negrita, despues } = leyendas[li][1], b = document.createElement('b');
+        if (negrita) b.textContent = negrita;
+        cap.replaceChildren(...[antes, negrita && b, despues].filter((x): x is string | HTMLElement => !!x));
+      }
+      rail.style.setProperty('--p', String(p));
+      [.04, .44, .71].forEach((d, i) => fases[i].classList.toggle('on', p > d));
+      stage.style.setProperty('--scan', `${(p * 400) % 100}%`);
+    }
+
+    const objetivo = () => { const h = hf.offsetHeight - innerHeight; return h > 0 ? clamp(-hf.getBoundingClientRect().top / h) : 1; };
+    let actual = objetivo(), raf = 0, mover = false, mx = .5, my = .4;
+    const pedir = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    // Un solo bucle: suaviza el avance y aplica la luz y el paralaje; se apaga cuando no queda nada por mover.
+    function tick() {
+      raf = 0;
+      const o = objetivo();
+      actual += (o - actual) * .115;
+      if (Math.abs(o - actual) < .0005) actual = o;
+      render(actual);
+      if (mover) {
+        mover = false;
+        stage.style.setProperty('--mx', `${mx * 100}%`); stage.style.setProperty('--my', `${my * 100}%`);
+        flow.style.setProperty('--px', `${(mx - .5) * -10}px`); flow.style.setProperty('--py', `${(my - .5) * -6}px`);
+      }
+      if (actual !== o) pedir();
+    }
+
+    montar();
+    render(actual);
+    addEventListener('scroll', pedir, { passive: true });
+    addEventListener('resize', pedir);
+    angosta.addEventListener('change', () => { montar(); pedir(); });
+    if (matchMedia('(pointer: fine)').matches) {
+      stage.addEventListener('pointermove', (e) => {
+        const r = stage.getBoundingClientRect();
+        mx = (e.clientX - r.left) / r.width; my = (e.clientY - r.top) / r.height; mover = true; pedir();
+      });
+    }
+  }
+</script>
+
+<style>
+  /* Escena final quieta por defecto; el bloque de movimiento de abajo la rebobina cuando hay scrub. */
+  .hf{position:relative;overflow-x:clip}
+  .stage{position:relative;display:grid;grid-template-rows:auto auto 1fr auto;gap:clamp(10px,2vh,20px)}
+  .head{display:grid;gap:6px}
+  h1{font-size:clamp(28px,5.2vw,58px);font-weight:700}
+  .m{color:var(--ai)} .c{color:var(--gold)}
+  /* Credenciales: una línea en mono; en el celular el texto puede envolver (los span son en línea). */
+  .who{font-family:var(--mono);font-size:12px;color:var(--muted);max-width:none}
+  .who span{margin-right:14px}
+  .who b{color:var(--ink);font-weight:500}
+  .cap{font-size:clamp(14px,1.6vw,17px);color:var(--muted);min-height:1.5em}
+  .cap :global(b){color:var(--ink);font-weight:500}
+  .c-ini,.c-fin b{display:none}
+
+  .rail{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .rail span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);border-top:2px solid var(--line);padding-top:6px;transition:color .3s}
+  .rail i{position:absolute;left:0;top:0;height:2px;background:linear-gradient(90deg,var(--ai),var(--gold));width:calc(var(--p,1) * 100%)}
+
+  .main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:clamp(12px,2.5vw,32px);min-height:0;align-items:center}
+  .flow{min-width:0;transform:translate(var(--px,0px),var(--py,0px));transition:transform .4s ease-out}
+  .flow svg{display:block;width:100%;height:auto;overflow:visible}
+  .flow .v-alta{display:none}
+  .ilus{max-width:none;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+
+  .slot{fill:none;stroke:var(--muted);stroke-opacity:.35;stroke-dasharray:4 5}
+  .box{fill:var(--surface);stroke-width:1.5;transition:stroke-width .3s}
+  .halo{opacity:0;transition:opacity .35s}
+  .act .halo{opacity:.55} .act .box{stroke-width:2.2} .act .sub{fill:var(--ink)}
+  .tg{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em}
+  .lbl{font-family:var(--display);font-weight:700;font-size:16px;fill:var(--ink)}
+  .sub{font-family:var(--mono);font-size:10.5px;fill:var(--muted);transition:fill .3s}
+  .t-entrada .box{stroke:var(--muted)} .t-entrada :is(.tg,.halo){fill:var(--muted)}
+  .t-ia .box{stroke:var(--ai)} .t-ia :is(.tg,.halo){fill:var(--ai)}
+  .t-codigo .box{stroke:var(--gold)} .t-codigo :is(.tg,.halo){fill:var(--gold)}
+  .t-humano .box{stroke:var(--ok);stroke-dasharray:5 4} .t-humano :is(.tg,.halo){fill:var(--ok)}
+  .node.bad .box{stroke:var(--bad);fill:var(--bad-dim)} .node.bad .halo{fill:var(--bad);opacity:.6} .node.bad :is(.sub,.tg){fill:var(--bad)}
+  .shield{fill:none;stroke:var(--bad)}
+  .edge{fill:none;stroke:var(--muted);stroke-opacity:.55;stroke-width:1.6}
+  .edge.lit{stroke:var(--ai);stroke-opacity:1}
+  .edge.t-humano{stroke:var(--ok);stroke-opacity:.7}
+  .p-ai{fill:var(--ai)} .p-bad{fill:var(--bad)} .p-ok{fill:var(--ok)}
+  .cur line{stroke:var(--ink);stroke-width:1;opacity:.5}
+  .cur .r{fill:none;stroke:var(--ink);stroke-width:1.4}
+  .cur .d{fill:var(--ink)}
+  .cur text{font-family:var(--mono);font-size:10px;fill:var(--ink);letter-spacing:.06em}
+  .hf:not(.live) :is(.cur,.pulse){display:none}
+
+  .chat{min-width:0;align-self:stretch;display:grid;grid-template-rows:auto 1fr;border:1px solid var(--line);border-radius:14px;
+    background:color-mix(in srgb,var(--surface) 85%,transparent);backdrop-filter:blur(6px)}
+  .chat-h{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .msgs{display:flex;flex-direction:column;justify-content:flex-end;padding:6px 12px 12px;min-height:0}
+  .msg{flex-shrink:0;max-width:88%;margin-top:8px;padding:8px 12px;font-size:14px;line-height:1.4;border-radius:12px;overflow:hidden}
+  .msg.user{align-self:flex-end;background:var(--ai-dim);border-bottom-right-radius:4px}
+  .msg.bot{align-self:flex-start;background:var(--raise);border:1px solid var(--line);border-bottom-left-radius:4px}
+  .msg small{display:block;margin-top:4px;font-family:var(--mono);font-size:10.5px;color:var(--gold)}
+  .msg.bad{background:var(--bad-dim);border:1px solid color-mix(in srgb,var(--bad) 45%,transparent)}
+  .msg.sys{align-self:center;max-width:100%;text-align:center;font-family:var(--mono);font-size:11px;color:var(--bad);letter-spacing:.04em}
+
+  .cta{justify-self:center;display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center;transition:opacity .4s,transform .4s}
+  .cta a{font-family:var(--display);font-weight:700;font-size:16px;color:var(--bg);background:var(--gold);padding:10px 18px;border-radius:999px;text-decoration:none}
+  .cta a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  .cta span{display:none;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .hint{display:none}
+
+  @media (max-width:760px){
+    .main{grid-template-columns:1fr}
+    .flow .v-ancha{display:none} .flow .v-alta{display:block}
+    .cap{min-height:3em}
+    .who{font-size:11px}
+    .msg{font-size:13.5px}
+    .rail span{font-size:10px}
+  }
+
+  /* Scrub: solo con JS y sin movimiento reducido. Este es el estado inicial (p = 0) hasta que el script
+     toma el control con .live; si decide no animar, pone .still y vuelve la escena final. */
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference){
+    .hf:not(.still){height:350vh}
+    .hf:not(.still) .stage{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;padding-block:clamp(14px,3vh,32px)}
+    .hf:not(.still) .flow svg{max-height:58vh}
+    .hf:not(.still) .chat{max-height:58vh;transition:opacity .4s,transform .4s}
+    .hf:not(.still) .chat:not(.on){opacity:0;transform:translateY(14px)}
+    .hf:not(.still) .msgs{overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 28px);mask-image:linear-gradient(180deg,transparent 0,#000 28px)}
+    .hf:not(.still) .msg{max-height:140px;transition:max-height .35s,opacity .3s,margin-top .35s,padding .35s}
+    .hf:not(.still) .msg:not(.on){max-height:0;opacity:0;margin-top:0;padding-block:0}
+    .hf:not(.still) .rail span:not(.on){color:var(--muted)}
+    .hf:not(.still) .cta span{display:inline}
+    .hf:not(.still) .cta:not(.on):not(:focus-within){opacity:0;transform:translateY(10px)}
+    .hf:not(.still) .hint{display:block;position:absolute;left:50%;bottom:calc(clamp(14px,3vh,32px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+      font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:opacity .3s}
+    .hint::after{content:"";display:block;width:1px;height:22px;margin:6px auto 0;background:linear-gradient(var(--muted),transparent)}
+    .hf:not(.still) .c-ini{display:inline} .hf:not(.still) .c-fin{display:none}
+    .hf:not(.still):not(.live) :is(.node,.shield){opacity:0}
+    .hf:not(.still):not(.live) .edge{visibility:hidden}
+    .hf:not(.still):not(.live) .rail i{--p:0}
+    .hf.live .stage::after{content:"";position:absolute;inset:0;pointer-events:none;
+      background:linear-gradient(180deg,transparent 0,color-mix(in srgb,var(--ai) 4%,transparent) 50%,transparent 100%) 0 var(--scan,0%)/100% 30% no-repeat}
+  }
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) and (max-width:760px){
+    .hf:not(.still){height:320vh}
+    .hf:not(.still) .main{grid-template-rows:auto minmax(0,1fr);align-items:start}
+    .hf:not(.still) .flow svg{max-height:34vh}
+    .hf:not(.still) .chat{max-height:none;height:100%}
+  }
+  @media (scripting: enabled) and (prefers-reduced-motion: no-preference) and (pointer: fine){
+    .hf.live .stage{background:radial-gradient(600px 420px at var(--mx,50%) var(--my,40%),color-mix(in srgb,var(--ai) 9%,transparent),transparent 70%)}
+  }
+</style>

@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Lanes from '../components/Lanes.astro';
+import HeroFlujo from '../components/HeroFlujo.astro';
 import AgentCard from '../components/AgentCard.astro';
 import Method from '../components/Method.astro';
 import Contact from '../components/Contact.astro';
@@ -13,16 +13,8 @@ import { agentes } from '../data/agentes';
   </div>
 
   <header class="hero">
-    <span class="label">Arquitecto de soluciones de IA · Bogotá</span>
-    <h1>El modelo <span class="ai">conversa</span>.<br />El código <span class="det">decide</span>.</h1>
+    <HeroFlujo />
     <p class="lede">Soy Mario Zarta. Diseño y construyo agentes de IA que llegan a producción: hablan con el cliente, usan herramientas y dejan el dinero, los datos y las acciones irreversibles en código verificable.</p>
-    <div class="who">
-      <span><b>10+ años</b> en software y producto</span>
-      <span><b>Líder de IA</b> · Consultorsalud</span>
-      <span><b>Claude · MCP · Agentes · RAG</b></span>
-    </div>
-    <Lanes />
-    <a class="cta" href="/arquitectura">Cómo diseño agentes →</a>
   </header>
 
   <section class="section" id="agentes">
@@ -40,11 +32,5 @@ import { agentes } from '../data/agentes';
   nav{display:flex;gap:16px;flex-wrap:wrap}
   nav a{color:var(--muted);text-decoration:none} nav a:hover{color:var(--ink)}
   .hero{display:flex;flex-direction:column;gap:22px}
-  .ai{color:var(--ai)} .det{color:var(--gold)}
   .lede{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:60ch}
-  .who{display:flex;flex-wrap:wrap;gap:8px 18px;font-family:var(--mono);font-size:13px;color:var(--muted)}
-  .who b{color:var(--ink);font-weight:500}
-  .cta{align-self:flex-start;font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);text-decoration:none;
-    border-bottom:2px solid var(--gold);padding-bottom:2px}
-  .cta:hover{color:var(--gold)}
 </style>
