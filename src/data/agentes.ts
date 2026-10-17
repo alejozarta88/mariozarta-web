@@ -67,7 +67,7 @@ export const agentes: Agente[] = [
       'El cliente conversa con un agente, ve la cartelera, elige asientos en un mapa y paga sin salir de WhatsApp. Los asientos se bloquean 30 minutos y la venta se confirma solo cuando la pasarela aprueba.',
     flujo: [
       { texto: 'WhatsApp', tipo: 'entrada' },
-      { texto: 'Agente IA · Model Armor', tipo: 'ia' },
+      { texto: 'Agente IA · guardrails (nivel medio)', tipo: 'ia' },
       { texto: '6 herramientas MCP', tipo: 'ia' },
       { texto: 'calcular-total', tipo: 'codigo' },
       { texto: 'Mercado Pago', tipo: 'codigo' },
@@ -86,7 +86,7 @@ export const agentes: Agente[] = [
       { valor: 2, etiqueta: 'rondas de auditoría independiente' },
       { valor: 0, etiqueta: 'hallazgos críticos al cierre' },
     ],
-    stack: 'Deno · TypeScript · Zod · Jelou Databases · crons · Model Armor',
+    stack: 'Deno · TypeScript · Zod · Jelou Databases · crons · guardrails de la plataforma',
     nota: 'Repositorio privado durante la evaluación; acceso a solicitud.',
   },
   {
@@ -132,26 +132,6 @@ export const agentes: Agente[] = [
     ],
     stack: 'TypeScript · Node.js · Render',
     enlace: { texto: 'github.com/alejozarta88/agente-conversacional', url: 'https://github.com/alejozarta88/agente-conversacional' },
-  },
-  {
-    slug: 'mcp-mesa-ayuda',
-    contexto: 'Laboratorio · 2026',
-    titulo: 'Servidor MCP para mesa de ayuda',
-    tags: ['MCP SDK', 'TypeScript', 'Human-in-the-loop'],
-    resumen:
-      'Cuatro herramientas para buscar, resumir y crear tickets. Escribir exige dos pasos: preparar y crear con un comprobante, para que una persona apruebe antes de cualquier cambio.',
-    flujo: [
-      { texto: 'Agente', tipo: 'ia' },
-      { texto: 'buscar · resumir', tipo: 'ia' },
-      { texto: 'preparar → comprobante', tipo: 'codigo' },
-      { texto: 'crear con aprobación', tipo: 'codigo' },
-    ],
-    decisiones: [
-      'La salida de las herramientas se marca como datos de terceros; un ticket con prompt injection forma parte de las pruebas.',
-      'Comprobante SHA-256 entre preparar y crear: lo que se aprueba es exactamente lo que se escribe.',
-      'Auditoría de cada escritura en un registro aparte; 9 de 9 pruebas en verde.',
-    ],
-    stack: 'TypeScript · @modelcontextprotocol/sdk · Zod · Vitest',
   },
   {
     slug: 'trio',

@@ -10,14 +10,15 @@ const corto: Record<string, string> = {
 const nombre = (slug: string) => corto[slug] ?? agentes.find((a) => a.slug === slug)!.titulo;
 // Explorador: solo agentes con patrones, en el orden de la portada.
 const conPatrones = agentes.filter((a) => patronesDe(a.slug).length > 0);
-const etiquetaCarril = { ia: 'IA', codigo: 'código determinista', humano: 'persona' };
+const etiquetaCarril = { ia: 'IA', codigo: 'código', humano: 'persona' };
 
-const principios = [
-  'El modelo conversa, el código decide. Lo que no se puede deshacer no lo ejecuta el modelo.',
-  'Mínimo privilegio. Cada agente tiene solo las herramientas y permisos que necesita.',
-  'Quien escribe no califica. Un revisor sin contexto aprueba o rechaza.',
-  'Toda entrada externa es dato, no orden. Lo que llega de usuarios, documentos u otros agentes no da instrucciones.',
-  'Spec-first. Sin criterios de aceptación verificables no hay código.',
+type IconoPrincipio = 'carriles' | 'llave' | 'ojo' | 'embudo' | 'lista';
+const principios: { texto: string; icono: IconoPrincipio }[] = [
+  { texto: 'El modelo conversa, el código decide. Lo que no se puede deshacer no lo ejecuta el modelo.', icono: 'carriles' },
+  { texto: 'Mínimo privilegio. Cada agente tiene solo las herramientas y permisos que necesita.', icono: 'llave' },
+  { texto: 'Quien escribe no califica. Un revisor sin contexto aprueba o rechaza.', icono: 'ojo' },
+  { texto: 'Toda entrada externa es dato, no orden. Lo que llega de usuarios, documentos u otros agentes no da instrucciones.', icono: 'embudo' },
+  { texto: 'Spec-first. Sin criterios de aceptación verificables no hay código.', icono: 'lista' },
 ];
 
 const repo = 'https://github.com/alejozarta88/mariozarta-web';
@@ -31,11 +32,11 @@ const arquitectura: { texto: string; ref: string; url: string }[] = [
 
 type Icono = 'agente' | 'lenguaje' | 'datos' | 'integracion' | 'infraestructura' | 'web';
 const stack: { grupo: string; icono: Icono; items: string[] }[] = [
-  { grupo: 'Agentes e IA', icono: 'agente', items: ['Claude Code', 'MCP', 'Jelou Brain Studio'] },
+  { grupo: 'Agentes e IA', icono: 'agente', items: ['Claude Code', 'MCP', 'Jelou Brain Studio', 'API de Anthropic', 'API de OpenAI', 'n8n'] },
   { grupo: 'Lenguajes', icono: 'lenguaje', items: ['TypeScript', 'Deno', 'Node.js', 'Python', 'Bash'] },
-  { grupo: 'Datos', icono: 'datos', items: ['Jelou Databases'] },
+  { grupo: 'Datos', icono: 'datos', items: ['Jelou Databases', 'PostgreSQL'] },
   { grupo: 'Integraciones', icono: 'integracion', items: ['Mercado Pago', 'WhatsApp', 'Telegram', 'GitHub'] },
-  { grupo: 'Infraestructura', icono: 'infraestructura', items: ['Linux', 'systemd', 'cron', 'Cloudflare Pages', 'Render'] },
+  { grupo: 'Infraestructura', icono: 'infraestructura', items: ['Linux', 'systemd', 'cron', 'Cloudflare Pages', 'Render', 'Docker', 'Coolify'] },
   { grupo: 'Web', icono: 'web', items: ['Astro'] },
 ];
 ---
@@ -52,9 +53,25 @@ const stack: { grupo: string; icono: Icono; items: string[] }[] = [
     <p class="lede">Un modelo de lenguaje es muy bueno para entender lo que alguien quiere y muy malo para garantizar algo. Por eso separo los carriles: el modelo conversa y consulta; el dinero, los datos y las acciones irreversibles los decide código determinista, con pruebas, y las decisiones importantes las aprueba una persona.</p>
   </header>
 
-  <section class="block rise" id="principios">
+  <section class="block" id="principios">
     <h2>Principios</h2>
-    <ol class="dec">{principios.map((p) => <li>{p}</li>)}</ol>
+    <ol class="prs">
+      {principios.map((p, i) => (
+        <li class="pr rise">
+          <span class="pr-top">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              {p.icono === 'carriles' && <><path d="M4 4h8a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H8l-3 2.5V11H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" /><path d="M2 15.5h20" stroke-dasharray="2 2.5" /><path d="M17 18c-1 0-1.5.4-1.5 1.2v.6c0 .5-.4.9-1 1.2.6.3 1 .7 1 1.2" /><path d="M20 18c1 0 1.5.4 1.5 1.2v.6c0 .5.4.9 1 1.2-.6.3-1 .7-1 1.2" /></>}
+              {p.icono === 'llave' && <><circle cx="8" cy="15" r="4" /><path d="M11 12l8.5-8.5M16 7l2.5 2.5M13.5 9.5l2 2" /></>}
+              {p.icono === 'ojo' && <><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>}
+              {p.icono === 'embudo' && <path d="M3 4h18l-7 8.5V18l-4 2.5v-8L3 4z" />}
+              {p.icono === 'lista' && <><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M8 8.5l1.5 1.5 2.5-3M8 14l1.5 1.5 2.5-3M14.5 9h2.5M14.5 14.5h2.5" /></>}
+            </svg>
+            <span class="pr-n">{String(i + 1).padStart(2, '0')}</span>
+          </span>
+          <p>{p.texto}</p>
+        </li>
+      ))}
+    </ol>
   </section>
 
   <section class="block rise" id="explorador" aria-labelledby="explorador-t">
@@ -83,7 +100,7 @@ const stack: { grupo: string; icono: Icono; items: string[] }[] = [
       {patrones.map((p) => (
         <article class:list={['pat', 'rise', p.carril]} id={p.slug} data-patron={p.slug}>
           <details>
-            <summary><span class="nom">{p.nombre}</span><span class="car">{etiquetaCarril[p.carril]}</span></summary>
+            <summary><span class="nom">{p.nombre}</span><span class="car"><span class="dot" aria-hidden="true"></span>{etiquetaCarril[p.carril]}</span></summary>
             <p><b>Problema:</b> {p.problema}</p>
             <p><b>Decisión:</b> {p.decision}</p>
           </details>
@@ -200,6 +217,15 @@ const stack: { grupo: string; icono: Icono; items: string[] }[] = [
   .dec{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:70ch}
   .dec li::marker{color:var(--gold);font-family:var(--mono)}
 
+  /* Principios */
+  .prs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+  .pr{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:12px;
+    transition:border-color .3s,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .pr:hover{border-color:var(--gold)}
+  .pr-top{display:flex;justify-content:space-between;align-items:center}
+  .pr svg{color:var(--gold)}
+  .pr-n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
   /* Explorador */
   .xp{display:flex;flex-direction:column;gap:12px}
   .xp[hidden]{display:none}
@@ -217,7 +243,11 @@ const stack: { grupo: string; icono: Icono; items: string[] }[] = [
   .chip.patron.on.ia{border-color:var(--ai);background:var(--ai-dim)}
   .chip.patron.on.codigo{border-color:var(--gold);background:var(--gold-dim)}
   .chip.patron.on.humano{border:1.5px dashed var(--ok);border-left-width:3px}
-  .off{opacity:.35}
+  /* Atenuado legible (AA): chips al 0.6; tarjetas sin opacidad, título en --muted y borde neutro. */
+  .chip.off{opacity:.6}
+  .pat.off{border-left-color:var(--line)}
+  .pat.off .nom{color:var(--muted)}
+  .pat.off .dot{background:var(--muted)}
 
   /* Detalle de patrones */
   .pats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
@@ -235,7 +265,9 @@ const stack: { grupo: string; icono: Icono; items: string[] }[] = [
   details[open] summary::before{content:"−"}
   summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .nom{flex:1;font-family:var(--display);font-size:20px;font-weight:700;line-height:1.15}
-  .car{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none}
+  .car{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none;display:inline-flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+  .pat.ia .dot{background:var(--ai)} .pat.codigo .dot{background:var(--gold)} .pat.humano .dot{background:var(--ok)}
   .ags{font-size:14px}
 
   /* Stack */
@@ -245,6 +277,6 @@ const stack: { grupo: string; icono: Icono; items: string[] }[] = [
   .grupo svg{color:var(--gold);flex:none}
 
   @media (prefers-reduced-motion: reduce){
-    .chip,.pat{transition:none}
+    .chip,.pat,.pr{transition:none}
   }
 </style>

@@ -95,8 +95,6 @@ export const patrones: Patron[] = [
 ];
 
 // Igual que en agentes.ts: un patrón mal enlazado detiene el build aquí.
-// El MCP de mesa de ayuda no es evidencia de ningún patrón (spec 004).
-const SIN_EVIDENCIA = ['mcp-mesa-ayuda'];
 const slugs = new Set(agentes.map((a) => a.slug));
 for (const p of patrones) {
   if (!CARRILES.includes(p.carril)) {
@@ -104,7 +102,6 @@ for (const p of patrones) {
   }
   for (const s of [...p.agentes, ...Object.keys(p.nota ?? {})]) {
     if (!slugs.has(s)) throw new Error(`Patrón "${p.slug}": el agente "${s}" no existe en agentes.ts`);
-    if (SIN_EVIDENCIA.includes(s)) throw new Error(`Patrón "${p.slug}": "${s}" no se enlaza como evidencia`);
   }
 }
 
