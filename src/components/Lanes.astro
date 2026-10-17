@@ -8,7 +8,7 @@
       <text class="lanelbl" x="10" y="22">CARRIL DE IA · CONVERSA Y CONSULTA</text>
       <text class="lanelbl" x="10" y="140">CARRIL DETERMINISTA · COBRA Y CONFIRMA</text>
       <path class="track track-ai" d="M80 62 H 600" />
-      <path class="track" d="M600 62 C 640 62 640 180 600 180" style="stroke:var(--muted);opacity:.5" />
+      <path class="track track-turn" d="M600 62 C 640 62 640 180 600 180" />
       <path class="track track-det" d="M80 180 H 690" />
       <path id="route" d="M80 62 H 600 C 640 62 640 180 600 180 H 80" fill="none" stroke="none" />
       <path id="route2" d="M80 180 H 690" fill="none" stroke="none" />
@@ -46,6 +46,7 @@
   .track{fill:none;stroke:var(--line);stroke-width:2}
   .track-ai{stroke:var(--ai);opacity:.45;stroke-dasharray:4 6;animation:flow 1.2s linear infinite}
   .track-det{stroke:var(--gold);opacity:.55}
+  .track-turn{stroke:var(--muted);opacity:.5}
   .lanelbl{fill:var(--muted);font-size:11px;letter-spacing:.08em}
   .aside{fill:var(--muted);font-size:11px}
   .packet{fill:var(--ai)} .packet-pay{fill:var(--gold)}

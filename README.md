@@ -1,4 +1,4 @@
-# mariozarta.dev
+# Mario Zarta · agentes de IA
 
 Portafolio de agentes de IA de Mario Zarta. Sitio estático en [Astro](https://astro.build), publicado en Cloudflare Pages.
 
@@ -7,9 +7,9 @@ Portafolio de agentes de IA de Mario Zarta. Sitio estático en [Astro](https://a
 ## Desarrollo
 
 ```bash
-npm install
-npm run dev     # http://localhost:4321
-npm run build   # genera dist/
+pnpm install
+pnpm dev        # http://localhost:4321
+pnpm build      # genera dist/
 ```
 
 ## Agregar un agente
@@ -18,4 +18,4 @@ Edita `src/data/agentes.ts` y agrega un objeto. La portada y su página de detal
 
 ## Despliegue
 
-Cloudflare Pages · framework Astro · comando `npm run build` · carpeta `dist`.
+Cloudflare Pages · framework Astro · comando `pnpm build` · Node 22 (`.node-version`) · carpeta `dist`.
