@@ -1,3 +1,7 @@
+export type TipoPaso = 'entrada' | 'ia' | 'codigo' | 'humano';
+export const TIPOS_PASO: readonly TipoPaso[] = ['entrada', 'ia', 'codigo', 'humano'];
+export interface Paso { texto: string; tipo: TipoPaso }
+
 export interface Agente {
   slug: string;
   contexto: string;
@@ -6,7 +10,7 @@ export interface Agente {
   tags: string[];
   resumen: string;
   queHace?: string[];
-  flujo: { texto: string; det?: boolean }[];
+  flujo: Paso[];
   decisiones: string[];
   metricas?: { valor: number; etiqueta: string }[];
   stack: string;
@@ -29,13 +33,13 @@ export const agentes: Agente[] = [
       'El agente de investigación toma una tarea por turno y entrega su resultado como pull request. El de desarrollo trabaja en una rama y abre su pull request. Yo reviso y fusiono.',
     ],
     flujo: [
-      { texto: 'Telegram' },
-      { texto: 'Coordinador' },
-      { texto: 'Tarea', det: true },
-      { texto: 'Compuerta humana', det: true },
-      { texto: 'Agente' },
-      { texto: 'Pull request', det: true },
-      { texto: 'Revisión humana', det: true },
+      { texto: 'Telegram', tipo: 'entrada' },
+      { texto: 'Coordinador', tipo: 'ia' },
+      { texto: 'Tarea', tipo: 'codigo' },
+      { texto: 'Compuerta humana', tipo: 'humano' },
+      { texto: 'Agente', tipo: 'ia' },
+      { texto: 'Pull request', tipo: 'codigo' },
+      { texto: 'Revisión humana', tipo: 'humano' },
     ],
     decisiones: [
       'Los roles son sombreros; los usuarios son jaulas. Cada nivel de permiso es un usuario del sistema operativo, sin sudo y sin acceso a los demás. Cada agente tiene su propio token con el alcance mínimo.',
@@ -62,12 +66,12 @@ export const agentes: Agente[] = [
     resumen:
       'El cliente conversa con un agente, ve la cartelera, elige asientos en un mapa y paga sin salir de WhatsApp. Los asientos se bloquean 30 minutos y la venta se confirma solo cuando la pasarela aprueba.',
     flujo: [
-      { texto: 'WhatsApp' },
-      { texto: 'Agente IA · Model Armor' },
-      { texto: '6 herramientas MCP' },
-      { texto: 'calcular-total', det: true },
-      { texto: 'Mercado Pago', det: true },
-      { texto: 'confirmar idempotente', det: true },
+      { texto: 'WhatsApp', tipo: 'entrada' },
+      { texto: 'Agente IA · Model Armor', tipo: 'ia' },
+      { texto: '6 herramientas MCP', tipo: 'ia' },
+      { texto: 'calcular-total', tipo: 'codigo' },
+      { texto: 'Mercado Pago', tipo: 'codigo' },
+      { texto: 'confirmar idempotente', tipo: 'codigo' },
     ],
     decisiones: [
       'La herramienta que confirma la venta no está expuesta al modelo: la dispara el flujo tras el pago. Un "cóbrame 1 peso" no tiene a qué herramienta llegar.',
@@ -94,11 +98,11 @@ export const agentes: Agente[] = [
     resumen:
       'Extrae NIT, fecha y total de facturas en texto. Lo que no se puede leer con seguridad no se inventa: sale con confianza baja y va a revisión humana con el motivo escrito.',
     flujo: [
-      { texto: 'Spec' },
-      { texto: 'Prueba roja' },
-      { texto: 'Código' },
-      { texto: 'Agente revisor', det: true },
-      { texto: 'Pull request' },
+      { texto: 'Spec', tipo: 'humano' },
+      { texto: 'Prueba roja', tipo: 'ia' },
+      { texto: 'Código', tipo: 'ia' },
+      { texto: 'Agente revisor', tipo: 'ia' },
+      { texto: 'Pull request', tipo: 'codigo' },
     ],
     decisiones: [
       'El agente revisor encontró que "$ 119.000,00" se leía 100 veces más grande con confianza alta; se corrigió con un criterio nuevo y su prueba antes de cerrar.',
@@ -117,10 +121,10 @@ export const agentes: Agente[] = [
     resumen:
       'Agente conversacional que guía el registro de un contrato, confirma los datos con el usuario antes de guardarlos y queda desplegado para probarlo de punta a punta.',
     flujo: [
-      { texto: 'Usuario' },
-      { texto: 'Agente' },
-      { texto: 'Validación y confirmación', det: true },
-      { texto: 'Registro', det: true },
+      { texto: 'Usuario', tipo: 'entrada' },
+      { texto: 'Agente', tipo: 'ia' },
+      { texto: 'Validación y confirmación', tipo: 'codigo' },
+      { texto: 'Registro', tipo: 'codigo' },
     ],
     decisiones: [
       'El agente pide confirmación explícita antes de escribir.',
@@ -137,10 +141,10 @@ export const agentes: Agente[] = [
     resumen:
       'Cuatro herramientas para buscar, resumir y crear tickets. Escribir exige dos pasos: preparar y crear con un comprobante, para que una persona apruebe antes de cualquier cambio.',
     flujo: [
-      { texto: 'Agente' },
-      { texto: 'buscar · resumir' },
-      { texto: 'preparar → comprobante', det: true },
-      { texto: 'crear con aprobación', det: true },
+      { texto: 'Agente', tipo: 'ia' },
+      { texto: 'buscar · resumir', tipo: 'ia' },
+      { texto: 'preparar → comprobante', tipo: 'codigo' },
+      { texto: 'crear con aprobación', tipo: 'codigo' },
     ],
     decisiones: [
       'La salida de las herramientas se marca como datos de terceros; un ticket con prompt injection forma parte de las pruebas.',
@@ -157,10 +161,10 @@ export const agentes: Agente[] = [
     resumen:
       'CRM y ventas conversacionales por WhatsApp para pymes de Latinoamérica, con un motor de IA que atiende, califica y acompaña la venta sobre un catálogo multiproducto.',
     flujo: [
-      { texto: 'Cliente WhatsApp' },
-      { texto: 'Motor de IA' },
-      { texto: 'Catálogo y CRM', det: true },
-      { texto: 'Asesor humano' },
+      { texto: 'Cliente WhatsApp', tipo: 'entrada' },
+      { texto: 'Motor de IA', tipo: 'ia' },
+      { texto: 'Catálogo y CRM', tipo: 'codigo' },
+      { texto: 'Asesor humano', tipo: 'humano' },
     ],
     decisiones: [
       'El agente califica y prepara; la persona del equipo cierra cuando hace falta.',
@@ -169,3 +173,12 @@ export const agentes: Agente[] = [
     stack: 'WhatsApp Business API · TypeScript · PostgreSQL',
   },
 ];
+
+// astro build no comprueba tipos: un paso sin tipo válido detiene el build aquí.
+for (const a of agentes) {
+  for (const p of a.flujo) {
+    if (!TIPOS_PASO.includes(p.tipo)) {
+      throw new Error(`Paso sin tipo válido en el agente "${a.slug}": "${p.texto}" (tipo: ${String(p.tipo)})`);
+    }
+  }
+}

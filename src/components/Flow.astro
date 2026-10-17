@@ -1,18 +1,34 @@
 ---
-interface Props { pasos: { texto: string; det?: boolean }[] }
-const { pasos } = Astro.props;
+import { TIPOS_PASO, type Paso, type TipoPaso } from '../data/agentes';
+interface Props { pasos: Paso[]; leyenda?: boolean }
+const { pasos, leyenda = false } = Astro.props;
+const etiqueta: Record<TipoPaso, string> = { entrada: 'entrada', ia: 'IA', codigo: 'código determinista', humano: 'persona' };
+const presentes = TIPOS_PASO.filter((t) => pasos.some((p) => p.tipo === t));
 ---
 <div class="flow">
   {pasos.map((p, i) => (
     <>
       {i > 0 && <span class="arr" aria-hidden="true">→</span>}
-      <span class:list={['node', { det: p.det }]}>{p.texto}</span>
+      <span class:list={['node', p.tipo]}>{p.texto}<span class="sr-only"> ({etiqueta[p.tipo]})</span></span>
     </>
   ))}
 </div>
+{leyenda && (
+  <p class="note legend">
+    {presentes.map((t) => <span class="item"><span class:list={['sw', t]} aria-hidden="true"></span>{etiqueta[t]}</span>)}
+  </p>
+)}
 <style>
   .flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-family:var(--mono);font-size:12px}
   .node{border:1px solid var(--ai);background:var(--ai-dim);padding:5px 9px;border-radius:4px}
-  .node.det{border-color:var(--gold);background:var(--gold-dim)}
+  .node.codigo{border-color:var(--gold);background:var(--gold-dim)}
+  .node.entrada{border-color:var(--muted);background:transparent}
+  .node.humano{border:1.5px dashed var(--ok);background:transparent;padding:4.5px 8.5px}
   .arr{color:var(--muted)}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 14px}
+  .item{display:inline-flex;align-items:center;gap:6px}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:2px;border:1px solid var(--ai);background:var(--ai-dim)}
+  .sw.codigo{border-color:var(--gold);background:var(--gold-dim)}
+  .sw.entrada{border-color:var(--muted);background:transparent}
+  .sw.humano{border:1.5px dashed var(--ok);background:transparent}
 </style>
