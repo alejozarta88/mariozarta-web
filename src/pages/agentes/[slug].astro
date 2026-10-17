@@ -21,6 +21,13 @@ const { a, sig } = Astro.props;
     <p class="lede">{a.resumen}</p>
   </header>
 
+  {a.queHace && (
+    <section class="block">
+      <h3>Qué hace</h3>
+      <ul class="dec">{a.queHace.map((q) => <li>{q}</li>)}</ul>
+    </section>
+  )}
+
   <section class="block">
     <h3>Cómo viaja una solicitud</h3>
     <Flow pasos={a.flujo} />

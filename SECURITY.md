@@ -29,5 +29,7 @@ ni cookies.
   `.claude/agents/auditor-seguridad.md` audita una copia limpia (git worktree) sin contexto y en solo
   lectura. Los informes y la disposición de cada hallazgo quedan en `docs/gates/`. El gate se aprueba
   cuando una ronda no tiene hallazgos críticos ni altos.
+- **Publicación de gates**: En este repo solo se publican los gates del sitio. Los gates de otros
+  sistemas no se publican.
 
 Especificación: [`docs/specs/001-seguridad.md`](docs/specs/001-seguridad.md).

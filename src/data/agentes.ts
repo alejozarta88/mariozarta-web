@@ -5,6 +5,7 @@ export interface Agente {
   estado?: string;
   tags: string[];
   resumen: string;
+  queHace?: string[];
   flujo: { texto: string; det?: boolean }[];
   decisiones: string[];
   metricas?: { valor: number; etiqueta: string }[];
@@ -14,6 +15,44 @@ export interface Agente {
 }
 
 export const agentes: Agente[] = [
+  {
+    slug: 'escuadron',
+    contexto: 'Proyecto propio · en producción desde octubre de 2026',
+    titulo: 'Escuadrón de agentes',
+    estado: '3 agentes activos',
+    tags: ['Multiagente', 'Mínimo privilegio', 'Gates de auditoría', 'Claude Code'],
+    resumen:
+      'Un equipo de agentes autónomos que trabaja en un servidor propio: coordina por Telegram, investiga, abre pull requests y reporta. Cada agente tiene solo el permiso que necesita y nada llega a producción sin auditoría.',
+    queHace: [
+      'El coordinador recibe ideas por Telegram y las convierte en tareas (Issues de GitHub).',
+      'Solo yo marco una tarea como lista para un agente. Esa marca es la compuerta.',
+      'El agente de investigación toma una tarea por turno y entrega su resultado como pull request. El de desarrollo trabaja en una rama y abre su pull request. Yo reviso y fusiono.',
+    ],
+    flujo: [
+      { texto: 'Telegram' },
+      { texto: 'Coordinador' },
+      { texto: 'Tarea', det: true },
+      { texto: 'Compuerta humana', det: true },
+      { texto: 'Agente' },
+      { texto: 'Pull request', det: true },
+      { texto: 'Revisión humana', det: true },
+    ],
+    decisiones: [
+      'Los roles son sombreros; los usuarios son jaulas. Cada nivel de permiso es un usuario del sistema operativo, sin sudo y sin acceso a los demás. Cada agente tiene su propio token con el alcance mínimo.',
+      'Lista permitida de herramientas. El coordinador puede leer, buscar y crear tareas, pero no ejecutar comandos, escribir archivos ni marcar tareas para los agentes. Lo que no tiene permitido, lo pide.',
+      'Todo texto que viene de un agente es entrada no confiable. Al agente de investigación solo le llega el número de la tarea, validado; el resto lo lee él mismo.',
+      'Prechequeo sin IA: si no hay trabajo, el modelo no se despierta.',
+      'Lo que sale a terceros lo envía código, no el modelo. El agente de correo es un script determinista con plantillas fijas, validación de cada campo, topes diarios y un freno manual. Cada lista se aprueba fila por fila antes de enviarse. Está diseñado y auditado; aún sin instalar.',
+      'Quien construye no se audita. Todo cambio con privilegios pasa por un auditor en una sesión aparte, sin herramientas de escritura ni acceso a internet.',
+    ],
+    metricas: [
+      { valor: 12, etiqueta: 'rondas de auditoría' },
+      { valor: 8, etiqueta: 'rechazadas antes de aprobar: el gate no es un trámite' },
+      { valor: 0, etiqueta: 'agentes con sudo' },
+    ],
+    stack: 'Claude Code en modo headless · Linux endurecido · systemd y cron · Bash · Python (biblioteca estándar) para el envío de correo · GitHub Issues y pull requests como cola de trabajo · Telegram',
+    nota: 'El código es privado. Por seguridad no publico la configuración del servidor, las rutas, los permisos exactos ni los hallazgos que siguen abiertos; los hallazgos se cuentan cuando están cerrados. El detalle técnico lo muestro en entrevista.',
+  },
   {
     slug: 'cine-demo',
     contexto: 'Reto técnico · AI Solutions Engineer · Jelou · oct 2026',
