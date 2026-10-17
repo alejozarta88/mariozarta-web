@@ -9,7 +9,7 @@ import { agentes } from '../data/agentes';
 <Base title="Mario Zarta · Agentes de IA" description="Arquitecto de soluciones de IA. Agentes que llegan a producción: el modelo conversa, el código decide.">
   <div class="top">
     <a class="brand" href="/">Mario Zarta <span>· agentes de IA</span></a>
-    <nav aria-label="Secciones"><a href="#agentes">Agentes</a><a href="#metodo">Método</a><a href="#contacto">Contacto</a></nav>
+    <nav aria-label="Secciones"><a href="#agentes">Agentes</a><a href="/arquitectura">Arquitectura</a><a href="#metodo">Método</a><a href="#contacto">Contacto</a></nav>
   </div>
 
   <header class="hero">
@@ -22,6 +22,7 @@ import { agentes } from '../data/agentes';
       <span><b>Claude · MCP · Agentes · RAG</b></span>
     </div>
     <Lanes />
+    <a class="cta" href="/arquitectura">Cómo diseño agentes →</a>
   </header>
 
   <section class="section" id="agentes">
@@ -43,4 +44,7 @@ import { agentes } from '../data/agentes';
   .lede{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:60ch}
   .who{display:flex;flex-wrap:wrap;gap:8px 18px;font-family:var(--mono);font-size:13px;color:var(--muted)}
   .who b{color:var(--ink);font-weight:500}
+  .cta{align-self:flex-start;font-family:var(--display);font-size:22px;font-weight:700;color:var(--ink);text-decoration:none;
+    border-bottom:2px solid var(--gold);padding-bottom:2px}
+  .cta:hover{color:var(--gold)}
 </style>

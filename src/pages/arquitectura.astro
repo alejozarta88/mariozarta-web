@@ -1,0 +1,250 @@
+---
+import Base from '../layouts/Base.astro';
+import { agentes } from '../data/agentes';
+import { patrones, patronesDe } from '../data/patrones';
+
+// Nombres cortos tal como los usa el contenido del spec 004.
+const corto: Record<string, string> = {
+  escuadron: 'Escuadrón', 'cine-demo': 'Cine Demo', 'extractor-facturas': 'Extractor de facturas', trio: 'TRIO',
+};
+const nombre = (slug: string) => corto[slug] ?? agentes.find((a) => a.slug === slug)!.titulo;
+// Explorador: solo agentes con patrones, en el orden de la portada.
+const conPatrones = agentes.filter((a) => patronesDe(a.slug).length > 0);
+const etiquetaCarril = { ia: 'IA', codigo: 'código determinista', humano: 'persona' };
+
+const principios = [
+  'El modelo conversa, el código decide. Lo que no se puede deshacer no lo ejecuta el modelo.',
+  'Mínimo privilegio. Cada agente tiene solo las herramientas y permisos que necesita.',
+  'Quien escribe no califica. Un revisor sin contexto aprueba o rechaza.',
+  'Toda entrada externa es dato, no orden. Lo que llega de usuarios, documentos u otros agentes no da instrucciones.',
+  'Spec-first. Sin criterios de aceptación verificables no hay código.',
+];
+
+const repo = 'https://github.com/alejozarta88/mariozarta-web';
+const arquitectura: { texto: string; ref: string; url: string }[] = [
+  { texto: 'Hexagonal: el dominio no sabe que existe un agente.', ref: 'Cine Demo', url: '/agentes/cine-demo' },
+  { texto: 'Concurrencia optimista y bloqueos con expiración.', ref: 'Cine Demo', url: '/agentes/cine-demo' },
+  { texto: 'Cola de trabajo basada en tareas, con el estado en etiquetas.', ref: 'Escuadrón', url: '/agentes/escuadron' },
+  { texto: 'Aislamiento por mínimo privilegio en el sistema operativo.', ref: 'Escuadrón', url: '/agentes/escuadron' },
+  { texto: 'Sitio estático con fuente única de datos.', ref: 'este sitio', url: repo },
+];
+
+type Icono = 'agente' | 'lenguaje' | 'datos' | 'integracion' | 'infraestructura' | 'web';
+const stack: { grupo: string; icono: Icono; items: string[] }[] = [
+  { grupo: 'Agentes e IA', icono: 'agente', items: ['Claude Code', 'MCP', 'Jelou Brain Studio'] },
+  { grupo: 'Lenguajes', icono: 'lenguaje', items: ['TypeScript', 'Deno', 'Node.js', 'Python', 'Bash'] },
+  { grupo: 'Datos', icono: 'datos', items: ['Jelou Databases'] },
+  { grupo: 'Integraciones', icono: 'integracion', items: ['Mercado Pago', 'WhatsApp', 'Telegram', 'GitHub'] },
+  { grupo: 'Infraestructura', icono: 'infraestructura', items: ['Linux', 'systemd', 'cron', 'Cloudflare Pages', 'Render'] },
+  { grupo: 'Web', icono: 'web', items: ['Astro'] },
+];
+---
+<Base
+  title="Cómo diseño agentes · Mario Zarta"
+  description="Un modelo de lenguaje es muy bueno para entender lo que alguien quiere y muy malo para garantizar algo. Por eso separo los carriles: el modelo conversa y consulta; el dinero, los datos y las acciones irreversibles los decide código determinista, con pruebas, y las decisiones importantes las aprueba una persona."
+>
+  <div class="top"><a href="/">← Inicio</a><a class="brand" href="/">Mario Zarta <span>· agentes de IA</span></a></div>
+
+  <header class="head" id="tesis">
+    <span class="label">Arquitectura y patrones</span>
+    <h1>Cómo diseño agentes</h1>
+    <p class="claim">El modelo <span class="ai">conversa</span>. El código <span class="det">decide</span>.</p>
+    <p class="lede">Un modelo de lenguaje es muy bueno para entender lo que alguien quiere y muy malo para garantizar algo. Por eso separo los carriles: el modelo conversa y consulta; el dinero, los datos y las acciones irreversibles los decide código determinista, con pruebas, y las decisiones importantes las aprueba una persona.</p>
+  </header>
+
+  <section class="block rise" id="principios">
+    <h2>Principios</h2>
+    <ol class="dec">{principios.map((p) => <li>{p}</li>)}</ol>
+  </section>
+
+  <section class="block rise" id="explorador" aria-labelledby="explorador-t">
+    <h2 id="explorador-t">Explorador de patrones</h2>
+    <div class="xp" data-xp hidden>
+      <p class="note">Toca un agente o un patrón para ver cómo se relacionan. Un segundo toque limpia.</p>
+      <div class="row" role="group" aria-label="Agentes">
+        {conPatrones.map((a) => (
+          <button type="button" class="chip agente" aria-pressed="false" data-agente={a.slug}
+            data-patrones={patronesDe(a.slug).map((p) => p.slug).join(' ')}>{nombre(a.slug)}</button>
+        ))}
+      </div>
+      <div class="row" role="group" aria-label="Patrones">
+        {patrones.map((p) => (
+          <button type="button" class:list={['chip', 'patron', p.carril]} aria-pressed="false" data-patron={p.slug}
+            data-agentes={p.agentes.join(' ')}>{p.nombre}</button>
+        ))}
+      </div>
+      <p class="note" aria-live="polite" data-xp-estado></p>
+    </div>
+  </section>
+
+  <section class="block" id="patrones">
+    <h2>Patrones</h2>
+    <div class="pats">
+      {patrones.map((p) => (
+        <article class:list={['pat', 'rise', p.carril]} id={p.slug} data-patron={p.slug}>
+          <details>
+            <summary><span class="nom">{p.nombre}</span><span class="car">{etiquetaCarril[p.carril]}</span></summary>
+            <p><b>Problema:</b> {p.problema}</p>
+            <p><b>Decisión:</b> {p.decision}</p>
+          </details>
+          <p class="ags">
+            <span class="note">Agentes:</span>{' '}
+            {p.agentes.map((s, i) => (
+              <>{i > 0 && ', '}<a href={`/agentes/${s}`}>{nombre(s)}</a>{p.nota?.[s] && <span class="note"> ({p.nota[s]})</span>}</>
+            ))}
+            {p.extra && <> · <a href={p.extra.url} target="_blank" rel="noopener noreferrer">{p.extra.texto}</a></>}
+          </p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="block rise" id="arquitectura-de-software">
+    <h2>Arquitectura de software</h2>
+    <ul class="dec">
+      {arquitectura.map((x) => (
+        <li>{x.texto} (<a href={x.url} {...(x.url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{x.ref}</a>)</li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="block rise" id="metodo">
+    <h2>Método</h2>
+    <p>Spec-first con criterios numerados · prueba antes que código · gates de auditoría con informe y disposición por hallazgo · deuda visible con criterio de cierre · decisiones documentadas con alternativas (DAR).</p>
+  </section>
+
+  <section class="block rise" id="stack">
+    <h2>Stack</h2>
+    <p>El stack es la herramienta; el criterio es lo que transfiere. Estos patrones no dependen del framework: los implementé con MCP, Claude Code y código propio, y se aplican igual con cualquier SDK de agentes.</p>
+    <div class="grupos">
+      {stack.map((g) => (
+        <div class="grupo">
+          <h3>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              {g.icono === 'agente' && <><rect x="5" y="8" width="14" height="11" rx="3" /><path d="M12 8V4.5M9.5 13h.01M14.5 13h.01M9.5 16.5h5" /><circle cx="12" cy="4" r="1" /></>}
+              {g.icono === 'lenguaje' && <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14" />}
+              {g.icono === 'datos' && <><ellipse cx="12" cy="6" rx="7" ry="2.5" /><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5" /></>}
+              {g.icono === 'integracion' && <path d="M4 9h13l-3.5-3.5M20 15H7l3.5 3.5" />}
+              {g.icono === 'infraestructura' && <><rect x="4" y="4" width="16" height="6" rx="1.5" /><rect x="4" y="14" width="16" height="6" rx="1.5" /><path d="M8 7h.01M8 17h.01" /></>}
+              {g.icono === 'web' && <><circle cx="12" cy="12" r="8.5" /><path d="M3.5 12h17M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5s1.2-6.1 3.5-8.5z" /></>}
+            </svg>
+            {g.grupo}
+          </h3>
+          <div class="tags">{g.items.map((t) => <span class="tag">{t}</span>)}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<script>
+  const xp = document.querySelector<HTMLElement>('[data-xp]');
+  if (xp) {
+    xp.hidden = false;
+    const estado = xp.querySelector<HTMLElement>('[data-xp-estado]')!;
+    const chipsA = [...xp.querySelectorAll<HTMLButtonElement>('[data-agente]')];
+    const chipsP = [...xp.querySelectorAll<HTMLButtonElement>('[data-patron]')];
+    const fichas = [...document.querySelectorAll<HTMLElement>('.pat[data-patron]')];
+    const plural = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
+
+    const limpiar = () => {
+      [...chipsA, ...chipsP, ...fichas].forEach((el) => el.classList.remove('on', 'off'));
+      [...chipsA, ...chipsP].forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      estado.textContent = '';
+    };
+    // Resalta los elementos cuyo slug está en la lista y atenúa el resto.
+    const marcar = (els: HTMLElement[], attr: string, slugs: string[]) =>
+      els.forEach((el) => { const on = slugs.includes(el.dataset[attr]!); el.classList.toggle('on', on); el.classList.toggle('off', !on); });
+
+    const activar = (b: HTMLButtonElement) => {
+      const yaActivo = b.getAttribute('aria-pressed') === 'true';
+      limpiar();
+      if (yaActivo) return;
+      b.setAttribute('aria-pressed', 'true');
+      if (b.dataset.agente) {
+        const ps = b.dataset.patrones!.split(' ');
+        marcar(chipsP, 'patron', ps);
+        marcar(fichas, 'patron', ps);
+        estado.textContent = `${b.textContent}: ${plural(ps.length, 'patrón', 'patrones')}`;
+      } else {
+        const as = b.dataset.agentes!.split(' ');
+        marcar(chipsA, 'agente', as);
+        estado.textContent = `${b.textContent}: ${plural(as.length, 'agente', 'agentes')}`;
+      }
+    };
+    [...chipsA, ...chipsP].forEach((b) => b.addEventListener('click', () => activar(b)));
+  }
+
+  // Un enlace a /arquitectura#<patron> abre su detalle.
+  const abrir = () => {
+    if (!location.hash) return;
+    let id: string;
+    // Un hash mal codificado (p. ej. #%E0%A4%A) no debe lanzar URIError: se ignora.
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+    document.getElementById(id)?.querySelector('details')?.setAttribute('open', '');
+  };
+  abrir();
+  addEventListener('hashchange', abrir);
+</script>
+
+<style>
+  .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px}
+  .top a{color:var(--muted);text-decoration:none} .top a:hover{color:var(--ink)}
+  .top .brand{color:var(--ink);text-decoration:none} .brand span{color:var(--gold)}
+  .head{display:flex;flex-direction:column;gap:18px}
+  .claim{font-family:var(--display);font-size:clamp(24px,4vw,34px);font-weight:700;line-height:1.1}
+  .ai{color:var(--ai)} .det{color:var(--gold)}
+  .lede{font-size:clamp(17px,2.2vw,20px);color:var(--muted)}
+  .block{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:24px}
+  .block h2{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .dec{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:70ch}
+  .dec li::marker{color:var(--gold);font-family:var(--mono)}
+
+  /* Explorador */
+  .xp{display:flex;flex-direction:column;gap:12px}
+  .xp[hidden]{display:none}
+  .row{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font:inherit;font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--surface);cursor:pointer;
+    border:1px solid var(--line);border-radius:4px;padding:6px 10px;text-align:left;
+    transition:opacity .25s,border-color .25s,background-color .25s}
+  .chip:hover{border-color:var(--muted)}
+  .chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .chip[aria-pressed="true"]{border-color:var(--ink);background:var(--raise)}
+  .chip.agente.on{border-color:var(--ink)}
+  .chip.patron.ia{border-left:3px solid var(--ai)}
+  .chip.patron.codigo{border-left:3px solid var(--gold)}
+  .chip.patron.humano{border-left:3px dashed var(--ok)}
+  .chip.patron.on.ia{border-color:var(--ai);background:var(--ai-dim)}
+  .chip.patron.on.codigo{border-color:var(--gold);background:var(--gold-dim)}
+  .chip.patron.on.humano{border:1.5px dashed var(--ok);border-left-width:3px}
+  .off{opacity:.35}
+
+  /* Detalle de patrones */
+  .pats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+  .pat{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:8px;padding:16px 18px;
+    display:flex;flex-direction:column;gap:10px;scroll-margin-top:24px;transition:border-color .3s,opacity .25s,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .pat.ia{border-left-color:var(--ai)} .pat.codigo{border-left-color:var(--gold)} .pat.humano{border-left:3px dashed var(--ok)}
+  .pat.ia:hover,.pat.ia.on,.pat.ia:target{border-color:var(--ai)}
+  .pat.codigo:hover,.pat.codigo.on,.pat.codigo:target{border-color:var(--gold)}
+  .pat.humano:hover,.pat.humano.on,.pat.humano:target{border-color:var(--ok);border-style:dashed}
+  details[open] summary{margin-bottom:10px}
+  details p+p{margin-top:8px}
+  summary{cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:12px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+";font-family:var(--mono);color:var(--muted);width:1ch;flex:none}
+  details[open] summary::before{content:"−"}
+  summary:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .nom{flex:1;font-family:var(--display);font-size:20px;font-weight:700;line-height:1.15}
+  .car{font-family:var(--mono);font-size:11px;color:var(--muted);flex:none}
+  .ags{font-size:14px}
+
+  /* Stack */
+  .grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px}
+  .grupo{display:flex;flex-direction:column;gap:10px}
+  .grupo h3{display:flex;align-items:center;gap:8px}
+  .grupo svg{color:var(--gold);flex:none}
+
+  @media (prefers-reduced-motion: reduce){
+    .chip,.pat{transition:none}
+  }
+</style>

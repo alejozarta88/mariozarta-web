@@ -2,11 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import Flow from '../../components/Flow.astro';
 import { agentes } from '../../data/agentes';
+import { patronesDe } from '../../data/patrones';
 
 export function getStaticPaths() {
   return agentes.map((a, i) => ({ params: { slug: a.slug }, props: { a, sig: agentes[(i + 1) % agentes.length] } }));
 }
 const { a, sig } = Astro.props;
+const pats = patronesDe(a.slug);
 ---
 <Base title={`${a.titulo} · Mario Zarta`} description={a.resumen}>
   <div class="top"><a href="/#agentes">← Todos los agentes</a><a class="brand" href="/">Mario Zarta <span>· agentes de IA</span></a></div>
@@ -47,6 +49,13 @@ const { a, sig } = Astro.props;
     <ol class="dec">{a.decisiones.map((d) => <li>{d}</li>)}</ol>
   </section>
 
+  {pats.length > 0 && (
+    <section class="block">
+      <h3>Patrones que aplica</h3>
+      <div class="pchips">{pats.map((p) => <a class:list={['pchip', p.carril]} href={`/arquitectura#${p.slug}`}>{p.nombre}</a>)}</div>
+    </section>
+  )}
+
   <section class="block">
     <h3>Stack</h3>
     <p>{a.stack}</p>
@@ -70,6 +79,11 @@ const { a, sig } = Astro.props;
   .stat{border-top:1px solid var(--line);padding-top:8px}
   .stat b{display:block;font-family:var(--display);font-size:44px;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold)}
   .stat span{font-size:13px;color:var(--muted)}
+  .pchips{display:flex;flex-wrap:wrap;gap:8px}
+  .pchip{font-family:var(--mono);font-size:12px;color:var(--ink);text-decoration:none;background:var(--surface);
+    border:1px solid var(--line);border-left:3px solid var(--line);border-radius:4px;padding:6px 10px}
+  .pchip.ia{border-left-color:var(--ai)} .pchip.codigo{border-left-color:var(--gold)} .pchip.humano{border-left:3px dashed var(--ok)}
+  .pchip:hover{border-color:var(--gold)}
   .next{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;text-decoration:none;color:var(--ink);font-family:var(--display);font-size:22px}
   .next:hover{border-color:var(--gold)}
 </style>
