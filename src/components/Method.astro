@@ -1,0 +1,29 @@
+---
+const pasos = [
+  ['SPEC', 'Criterios de aceptación verificables antes del código.'],
+  ['PRUEBA ROJA', 'Cada criterio tiene una prueba que lo nombra.'],
+  ['CÓDIGO', 'Reglas en el dominio, sin efectos; adaptadores afuera.'],
+  ['AUDITORÍA', 'Un agente revisor sin contexto, en solo lectura.'],
+  ['DEUDA VISIBLE', 'Lo pendiente queda escrito con su criterio de cierre.'],
+];
+---
+<section class="section" id="metodo">
+  <span class="label">Cómo construyo</span>
+  <h2>Cada regla deja rastro</h2>
+  <div class="pipe">
+    {pasos.map(([t, d]) => <div class="step"><b>{t}</b><p>{d}</p></div>)}
+  </div>
+</section>
+<style>
+  .pipe{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+  .step{padding:18px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;position:relative}
+  .step:last-child{border-right:0}
+  .step b{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.06em}
+  .step p{font-size:14px;color:var(--muted)}
+  .step::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--gold);transition:width .6s ease}
+  :global(.pipe.lit) .step::after{width:100%}
+  .step:nth-child(2)::after{transition-delay:.15s} .step:nth-child(3)::after{transition-delay:.3s}
+  .step:nth-child(4)::after{transition-delay:.45s} .step:nth-child(5)::after{transition-delay:.6s}
+  @media (max-width:760px){ .pipe{grid-template-columns:1fr} .step{border-right:0;border-bottom:1px solid var(--line)} .step:last-child{border-bottom:0} }
+  @media (prefers-reduced-motion: reduce){ .step::after{transition:none} }
+</style>

@@ -1,0 +1,70 @@
+---
+import Base from '../../layouts/Base.astro';
+import Flow from '../../components/Flow.astro';
+import { agentes } from '../../data/agentes';
+
+export function getStaticPaths() {
+  return agentes.map((a, i) => ({ params: { slug: a.slug }, props: { a, sig: agentes[(i + 1) % agentes.length] } }));
+}
+const { a, sig } = Astro.props;
+---
+<Base title={`${a.titulo} · Mario Zarta`} description={a.resumen}>
+  <div class="top"><a href="/#agentes">← Todos los agentes</a><span class="brand">mariozarta<span>.dev</span></span></div>
+
+  <header class="head">
+    <span class="label">{a.contexto}</span>
+    <h1>{a.titulo}</h1>
+    <div class="tags">
+      {a.estado && <span class="tag st">{a.estado}</span>}
+      {a.tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+    <p class="lede">{a.resumen}</p>
+  </header>
+
+  <section class="block">
+    <h3>Cómo viaja una solicitud</h3>
+    <Flow pasos={a.flujo} />
+    <p class="note"><span class="ai">■</span> carril de IA · <span class="det">■</span> código determinista</p>
+  </section>
+
+  {a.metricas && (
+    <section class="block">
+      <h3>Evidencia</h3>
+      <div class="stats rise">
+        {a.metricas.map((m) => <div class="stat"><b data-n={m.valor}>{m.valor}</b><span>{m.etiqueta}</span></div>)}
+      </div>
+    </section>
+  )}
+
+  <section class="block">
+    <h3>Decisiones de diseño</h3>
+    <ol class="dec">{a.decisiones.map((d) => <li>{d}</li>)}</ol>
+  </section>
+
+  <section class="block">
+    <h3>Stack</h3>
+    <p>{a.stack}</p>
+    {a.enlace && <p><a href={a.enlace.url} target="_blank" rel="noopener">{a.enlace.texto}</a></p>}
+    {a.nota && <p class="note">{a.nota}</p>}
+  </section>
+
+  <a class="next" href={`/agentes/${sig.slug}`}><span class="label">Siguiente agente</span><span>{sig.titulo} →</span></a>
+</Base>
+<style>
+  .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:13px}
+  .top a{color:var(--muted);text-decoration:none} .top a:hover{color:var(--ink)}
+  .brand span{color:var(--gold)}
+  .head{display:flex;flex-direction:column;gap:18px}
+  h1{font-size:clamp(36px,6.5vw,64px)}
+  .lede{font-size:clamp(17px,2.2vw,20px);color:var(--muted)}
+  .block{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:24px}
+  .ai{color:var(--ai)} .det{color:var(--gold)}
+  .dec{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:70ch}
+  .dec li::marker{color:var(--gold);font-family:var(--mono)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+  .stat{border-top:1px solid var(--line);padding-top:8px}
+  .stat b{display:block;font-family:var(--display);font-size:44px;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold)}
+  .stat span{font-size:13px;color:var(--muted)}
+  .next{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:22px;text-decoration:none;color:var(--ink);font-family:var(--display);font-size:22px}
+  .next:hover{border-color:var(--gold)}
+</style>

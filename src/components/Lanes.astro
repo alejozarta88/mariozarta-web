@@ -1,0 +1,60 @@
+---
+// Diagrama vivo: un mensaje recorre el carril de IA y cruza al carril determinista hasta la venta confirmada.
+---
+<div class="stage" aria-label="Diagrama: una compra viaja del carril conversacional al carril de pago determinista">
+  <div class="scroll">
+    <svg viewBox="0 0 900 230" role="img" aria-labelledby="dgt">
+      <title id="dgt">Carril de IA conversacional y carril de pago determinista</title>
+      <text class="lanelbl" x="10" y="22">CARRIL DE IA · CONVERSA Y CONSULTA</text>
+      <text class="lanelbl" x="10" y="140">CARRIL DETERMINISTA · COBRA Y CONFIRMA</text>
+      <path class="track track-ai" d="M80 62 H 600" />
+      <path class="track" d="M600 62 C 640 62 640 180 600 180" style="stroke:var(--muted);opacity:.5" />
+      <path class="track track-det" d="M80 180 H 690" />
+      <path id="route" d="M80 62 H 600 C 640 62 640 180 600 180 H 80" fill="none" stroke="none" />
+      <path id="route2" d="M80 180 H 690" fill="none" stroke="none" />
+      <g class="n-ai"><rect x="20" y="44" width="120" height="36" rx="5" /><text x="80" y="66" text-anchor="middle">WhatsApp</text></g>
+      <g class="n-ai"><rect x="185" y="44" width="150" height="36" rx="5" /><text x="260" y="66" text-anchor="middle">Agente de IA</text></g>
+      <g class="n-ai"><rect x="380" y="44" width="170" height="36" rx="5" /><text x="465" y="66" text-anchor="middle">Herramientas MCP</text></g>
+      <g class="n-det"><rect x="20" y="162" width="140" height="36" rx="5" /><text x="90" y="184" text-anchor="middle">calcular-total</text></g>
+      <g class="n-det"><rect x="200" y="162" width="140" height="36" rx="5" /><text x="270" y="184" text-anchor="middle">Mercado Pago</text></g>
+      <g class="n-det"><rect x="380" y="162" width="190" height="36" rx="5" /><text x="475" y="184" text-anchor="middle">confirmar · idempotente</text></g>
+      <g class="badge"><rect x="690" y="160" width="190" height="40" rx="20" /><text x="785" y="185" text-anchor="middle">✓ venta confirmada</text></g>
+      <text x="655" y="126" class="aside">"cóbrame 1 peso" →</text>
+      <text x="655" y="142" class="aside">no llega a ninguna herramienta</text>
+      <circle class="packet" r="7">
+        <animateMotion dur="7s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.55;1" calcMode="linear"><mpath href="#route" /></animateMotion>
+        <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.55;0.56;1" />
+      </circle>
+      <circle class="packet-pay" r="7" opacity="0">
+        <animateMotion dur="7s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.55;0.85;1" calcMode="linear"><mpath href="#route2" /></animateMotion>
+        <animate attributeName="opacity" dur="7s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.55;0.56;0.86;1" />
+      </circle>
+    </svg>
+  </div>
+  <div class="cap">
+    <span><i class="dot ai"></i>El modelo puede ver cartelera, bloquear asientos y cotizar</span>
+    <span><i class="dot det"></i>Solo el código fija el precio y confirma la venta</span>
+  </div>
+</div>
+<style>
+  .stage{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+  .scroll{overflow-x:auto}
+  svg{display:block;width:100%;min-width:640px;height:auto}
+  svg text{font-family:var(--mono);font-size:12px}
+  .n-ai rect{fill:var(--ai-dim);stroke:var(--ai)} .n-ai text{fill:var(--ink)}
+  .n-det rect{fill:var(--gold-dim);stroke:var(--gold)} .n-det text{fill:var(--ink)}
+  .track{fill:none;stroke:var(--line);stroke-width:2}
+  .track-ai{stroke:var(--ai);opacity:.45;stroke-dasharray:4 6;animation:flow 1.2s linear infinite}
+  .track-det{stroke:var(--gold);opacity:.55}
+  .lanelbl{fill:var(--muted);font-size:11px;letter-spacing:.08em}
+  .aside{fill:var(--muted);font-size:11px}
+  .packet{fill:var(--ai)} .packet-pay{fill:var(--gold)}
+  .badge rect{fill:var(--ok);fill-opacity:.15;stroke:var(--ok)} .badge text{fill:var(--ok);font-weight:500}
+  .badge{transform-box:fill-box;transform-origin:center;animation:pop 7s ease-in-out infinite}
+  @keyframes flow{to{stroke-dashoffset:-20}}
+  @keyframes pop{0%,78%{transform:scale(1)}84%{transform:scale(1.08)}90%,100%{transform:scale(1)}}
+  .cap{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .dot.ai{background:var(--ai)} .dot.det{background:var(--gold)}
+  @media (prefers-reduced-motion: reduce){ .track-ai,.badge{animation:none} .packet,.packet-pay{display:none} }
+</style>

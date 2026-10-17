@@ -1,0 +1,46 @@
+---
+import type { Agente } from '../data/agentes';
+import Flow from './Flow.astro';
+interface Props { a: Agente }
+const { a } = Astro.props;
+---
+<article class="card rise">
+  <div class="main">
+    <span class="label">{a.contexto}</span>
+    <h2><a class="title" href={`/agentes/${a.slug}`}>{a.titulo}</a></h2>
+    <div class="tags">
+      {a.estado && <span class="tag st">{a.estado}</span>}
+      {a.tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+    <p>{a.resumen}</p>
+    <Flow pasos={a.flujo} />
+  </div>
+  <div class="side">
+    {a.metricas ? (
+      <div class="stats">
+        {a.metricas.map((m) => <div class="stat"><b data-n={m.valor}>{m.valor}</b><span>{m.etiqueta}</span></div>)}
+      </div>
+    ) : (
+      <><h3>Decisión clave</h3><p class="note">{a.decisiones[0]}</p></>
+    )}
+    <a class="btn ghost" href={`/agentes/${a.slug}`}>Ver arquitectura y decisiones →</a>
+  </div>
+</article>
+<style>
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:28px;
+    display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px 32px;overflow:hidden;transition:border-color .3s}
+  .card::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+    background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),var(--gold-dim),transparent 60%)}
+  .card:hover{border-color:var(--gold)} .card:hover::before{opacity:.9}
+  .card>*{position:relative}
+  .main,.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .side{justify-content:space-between}
+  h2{font-size:clamp(24px,3.2vw,32px)}
+  .title{color:var(--ink);text-decoration:none}
+  .title:hover{color:var(--gold)}
+  .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .stat{border-top:1px solid var(--line);padding-top:8px}
+  .stat b{display:block;font-family:var(--display);font-size:34px;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold)}
+  .stat span{font-size:13px;color:var(--muted)}
+  @media (max-width:760px){ .card{grid-template-columns:1fr;padding:22px} }
+</style>

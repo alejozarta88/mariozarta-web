@@ -1,0 +1,83 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;700&display=swap" />
+  </head>
+  <body>
+    <div id="cursor-glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <slot />
+      <footer class="note" style="border-top:1px solid var(--line);padding-top:16px">
+        Mario Alejandro Zarta Arias · Arquitecto de soluciones de IA · Bogotá ·
+        <a href="https://github.com/alejozarta88" target="_blank" rel="noopener">Código de este sitio</a>
+      </footer>
+    </div>
+    <script>
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const glow = document.getElementById('cursor-glow');
+      if (glow && !reduce && matchMedia('(pointer:fine)').matches) {
+        addEventListener('pointermove', (e) => { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
+      } else if (glow) { glow.remove(); }
+
+      document.querySelectorAll<HTMLElement>('.card').forEach((el) => {
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect();
+          el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          el.style.setProperty('--my', `${e.clientY - r.top}px`);
+        });
+      });
+
+      const count = (el: HTMLElement) => {
+        const n = Number(el.dataset.n); if (!n) return;
+        let t0 = 0;
+        const step = (t: number) => { if (!t0) t0 = t; const p = Math.min(1, (t - t0) / 900);
+          el.textContent = String(Math.round(n * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(step); };
+        requestAnimationFrame(step);
+      };
+
+      if (!reduce && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('js');
+        const vh = innerHeight;
+        const pend = [...document.querySelectorAll<HTMLElement>('.rise')].filter((el) => el.getBoundingClientRect().top > vh);
+        pend.forEach((el) => el.classList.add('pending'));
+        const io = new IntersectionObserver((es) => es.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const el = e.target as HTMLElement;
+          el.classList.remove('pending'); el.classList.add('lit');
+          el.querySelectorAll<HTMLElement>('[data-n]').forEach(count);
+          io.unobserve(el);
+        }), { threshold: .15 });
+        pend.forEach((el) => io.observe(el));
+        document.querySelectorAll('.pipe').forEach((el) => io.observe(el));
+      } else {
+        document.querySelectorAll('.pipe').forEach((el) => el.classList.add('lit'));
+      }
+
+      const copy = document.getElementById('copy');
+      copy?.addEventListener('click', async () => {
+        const mail = document.getElementById('mail')!;
+        try { await navigator.clipboard.writeText(mail.textContent || ''); copy.textContent = 'Copiado'; }
+        catch { const r = document.createRange(); r.selectNodeContents(mail); const s = getSelection()!; s.removeAllRanges(); s.addRange(r); copy.textContent = 'Selecciona y copia'; }
+        setTimeout(() => (copy.textContent = 'Copiar correo'), 1800);
+      });
+    </script>
+  </body>
+</html>

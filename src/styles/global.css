@@ -1,0 +1,49 @@
+/* Concepto: portada con el diagrama vivo de dos carriles (IA vs. determinista); fichas técnicas con la misma anatomía. */
+:root{
+  --bg:#0B1220; --surface:#111A2C; --raise:#16213A; --ink:#E8ECF2; --muted:#93A0B4; --line:#24314A;
+  --gold:#D9B66F; --gold-dim:#3A321F; --ai:#8FA8FF; --ai-dim:#1E2846; --ok:#7CC9A1;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#F5F6F9; --surface:#FFFFFF; --raise:#EEF1F6; --ink:#0B1220; --muted:#566174; --line:#D9DEE7;
+  --gold:#8C6A26; --gold-dim:#F2EAD8; --ai:#3D59C7; --ai-dim:#E4E9FA; --ok:#2E6B4E; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#F5F6F9; --surface:#FFFFFF; --raise:#EEF1F6; --ink:#0B1220; --muted:#566174; --line:#D9DEE7;
+  --gold:#8C6A26; --gold-dim:#F2EAD8; --ai:#3D59C7; --ai-dim:#E4E9FA; --ok:#2E6B4E; color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:48px 48px;background-attachment:fixed;background-position:-1px -1px}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,transparent 0%,var(--bg) 70%);z-index:0}
+#cursor-glow{position:fixed;width:520px;height:520px;border-radius:50%;pointer-events:none;z-index:0;left:0;top:0;
+  background:radial-gradient(circle,var(--ai-dim) 0%,transparent 65%);opacity:.6;transform:translate(-50%,-50%);transition:opacity .4s}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding-block:32px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:72px}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h1,h2{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.02;letter-spacing:-.01em}
+h1{font-size:clamp(44px,8.5vw,92px);font-weight:700}
+h2{font-size:clamp(28px,4.2vw,40px);font-weight:700}
+h3{margin:0;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+p{margin:0;max-width:65ch}
+a{color:var(--gold);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.note{font-size:13px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--mono);font-size:12px;background:var(--raise);border:1px solid var(--line);padding:3px 8px;border-radius:3px}
+.tag.st{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.btn{font-family:var(--mono);font-size:13px;background:var(--gold);color:var(--bg);border:0;border-radius:4px;padding:8px 12px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--gold)}
+.section{display:flex;flex-direction:column;gap:24px}
+/* Movimiento: todo arranca visible; solo desplazamiento suave */
+.rise{transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.js .rise.pending{transform:translateY(18px)}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  #cursor-glow{display:none}
+  .rise,.js .rise.pending{transition:none;transform:none}
+}
